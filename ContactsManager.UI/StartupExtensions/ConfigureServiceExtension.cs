@@ -1,5 +1,8 @@
-﻿using CRUD.Filters.ActionFilters;
+﻿using ContactsManager.Core.Domain.IdentityEntities;
+using CRUD.Filters.ActionFilters;
 using Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Repositories;
 using RepositoryContracts;
@@ -43,6 +46,13 @@ namespace CRUD
             });
 
             services.AddTransient<PersonsListActionFilter>();
+
+            //Enable Identuty in this project
+            services.AddIdentity<ApplicationUser, ApplicationRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders()
+                .AddUserStore<UserStore<ApplicationUser, ApplicationRole, ApplicationDbContext, Guid>>()
+                .AddRoleStore<RoleStore<ApplicationRole, ApplicationDbContext, Guid>>();
 
             services.AddHttpLogging(op => { op.LoggingFields = Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.RequestProperties | Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.ResponsePropertiesAndHeaders; });
 

@@ -27,6 +27,9 @@
                     <a asp-controller="Account" asp-action="Register" >Register</a>
                     <a asp-controller="Account" asp-action="Login">Login</a>
                 </li>
+                <li>
+                    @User.Identity?.Name
+                </li>
             </ul>
         </div>
                     </div>
