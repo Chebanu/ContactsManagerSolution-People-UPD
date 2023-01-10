@@ -1,6 +1,7 @@
 ﻿using ContactsManager.Core.Domain.IdentityEntities;
 using CRUD.Filters.ActionFilters;
 using Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -39,13 +40,14 @@ namespace CRUD
             services.AddScoped<IPersonSorterService, PersonSorterService>();
             services.AddScoped<IPersonUpdaterService, PersonUpdaterService>();
             services.AddScoped<IPersonDeleterService, PersonDeleterService>();
+            services.AddTransient<PersonsListActionFilter>();
 
             services.AddDbContext<ApplicationDbContext>(option =>
             {
                 option.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
             });
 
-            services.AddTransient<PersonsListActionFilter>();
+            
 
             //Enable Identuty in this project
             services.AddIdentity<ApplicationUser, ApplicationRole>(op =>
@@ -62,6 +64,17 @@ namespace CRUD
                 .AddDefaultTokenProviders()
                 .AddUserStore<UserStore<ApplicationUser, ApplicationRole, ApplicationDbContext, Guid>>()
                 .AddRoleStore<RoleStore<ApplicationRole, ApplicationDbContext, Guid>>();
+
+            services.AddAuthorization(op =>
+            {
+                op.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build(); 
+                //enforces authoriation policy (user must be authenticated for all the action methods)
+            });
+
+            services.ConfigureApplicationCookie(op =>
+            {
+                op.LoginPath = "/Account/Login";
+            });
 
             services.AddHttpLogging(op => { op.LoggingFields = Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.RequestProperties | Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.ResponsePropertiesAndHeaders; });
 
