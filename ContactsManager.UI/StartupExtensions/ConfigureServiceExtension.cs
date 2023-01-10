@@ -48,7 +48,16 @@ namespace CRUD
             services.AddTransient<PersonsListActionFilter>();
 
             //Enable Identuty in this project
-            services.AddIdentity<ApplicationUser, ApplicationRole>()
+            services.AddIdentity<ApplicationUser, ApplicationRole>(op =>
+            { 
+                //Requirements for password
+                op.Password.RequiredLength = 8;
+                op.Password.RequireNonAlphanumeric = false;
+                op.Password.RequireUppercase = false;
+                op.Password.RequireLowercase = true;
+                op.Password.RequireDigit= false;
+                op.Password.RequiredUniqueChars = 3;
+            })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders()
                 .AddUserStore<UserStore<ApplicationUser, ApplicationRole, ApplicationDbContext, Guid>>()

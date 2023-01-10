@@ -45,7 +45,7 @@ namespace ContactsManager.UI.Controllers
             if (result.Succeeded)
             {
                 //Sign in
-                await _signInManager.SignInAsync(user, false);
+                await _signInManager.SignInAsync(user, isPersistent: false);
 
                 return RedirectToAction(nameof(PersonsController.Index), "Persons");
             }
@@ -57,8 +57,38 @@ namespace ContactsManager.UI.Controllers
                 }
                 return View(registerDTO);
             }
+        }
 
+        [HttpGet]
+        public IActionResult Login() 
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginDTO loginDTO)
+        {
+            if(!ModelState.IsValid)
+            {
+                ViewBag.Errors = ModelState.Values.SelectMany(x => x.Errors).Select(x => x.ErrorMessage);
+                return View(loginDTO);
+            }
 
+            var result = await _signInManager.PasswordSignInAsync(loginDTO.Email, loginDTO.Password, isPersistent: false, lockoutOnFailure: false);
+
+            if (result.Succeeded)
+            {
+                return RedirectToAction(nameof(PersonsController.Index), "Persons");
+            }
+
+            ModelState.AddModelError("Login", "Invalid emain or password");
+
+            return View(loginDTO);
+        }
+
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction(nameof(PersonsController.Index), "Persons");
         }
     }
 }
