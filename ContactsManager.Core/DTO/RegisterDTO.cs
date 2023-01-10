@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace ContactsManager.Core.DTO
         public string PersonName { get; set; }
         [Required(ErrorMessage = "Email cannot be blank")]
         [EmailAddress(ErrorMessage = "Email should be in a proper email address")]
+        [Remote(action: "IsEmailAlreadyRegistered", controller: "Account", ErrorMessage = "Email is already in use")]
         public string Email { get; set; }
         [Required(ErrorMessage = "Phone cannot be blank")]
         [RegularExpression("[0-9]*$", ErrorMessage = "Phone number should contain numbers only")]
