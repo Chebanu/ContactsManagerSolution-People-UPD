@@ -4,6 +4,7 @@ using Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Repositories;
 using RepositoryContracts;
@@ -19,11 +20,18 @@ static public class ConfigureServiceExtension
         services.AddTransient<ResponseHeaderActionFilter>();
 
 
-        services.AddControllersWithViews(op =>
+        services.AddControllersWithViews(options =>
         {
             var logger = services.BuildServiceProvider().GetRequiredService<ILogger<ResponseHeaderActionFilter>>();
 
-            op.Filters.Add(new ResponseHeaderActionFilter(logger) { Key = "My-Key-From-Global", Value = "My-Value-From-Global", Order = 2 });
+            options.Filters.Add(new ResponseHeaderActionFilter(logger) 
+            { 
+                Key = "My-Key-From-Global",
+                Value = "My-Value-From-Global",
+                Order = 2
+            });
+
+            options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());//it applies only for post requests
         });
 
         //add services into IoC container

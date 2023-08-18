@@ -34,6 +34,7 @@ public class AccountController : Controller
     }
     [HttpPost]
     [Authorize("NotAuthorized")]
+    //[ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterDTO registerDTO)
     {
         if (!ModelState.IsValid)
@@ -69,6 +70,16 @@ public class AccountController : Controller
             }
             else
             {
+                //Create user role
+                if (await _roleManager.FindByNameAsync(UserTypeOptions.User.ToString()) is null)
+                {
+                    var applicationRole = new ApplicationRole()
+                    {
+                        Name = UserTypeOptions.User.ToString()
+                    };
+                    await _roleManager.CreateAsync(applicationRole);
+                }
+
                 await _userManager.AddToRoleAsync(user, UserTypeOptions.User.ToString());
             }
             //Sign in
@@ -134,6 +145,7 @@ public class AccountController : Controller
         return RedirectToAction(nameof(PersonsController.Index), "Persons");
     }
 
+    [AllowAnonymous]
     public async Task<IActionResult> IsEmailAlreadyRegistered(string email)
     {
         ApplicationUser user = await _userManager.FindByEmailAsync(email);
